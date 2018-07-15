@@ -1,6 +1,6 @@
 {
-  "name": "patternfly-react-demo-app",
-  "version": "0.3.0",
+  "name": "zuul-ui",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "classnames": "^2.2.5",
@@ -16,7 +16,8 @@
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
     "sortabular": "^1.5.1",
-    "table-resolver": "^3.2.0"
+    "table-resolver": "^3.2.0",
+    "yarn": "^1.7.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.2",

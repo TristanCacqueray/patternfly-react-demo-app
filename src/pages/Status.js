@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Grid } from 'patternfly-react';
 import { EmptyStateComponent } from '../components/EmptyStateComponent';
 
-const DolorPage = () => (
+const StatusPage = () => (
   <Grid fluid className="container-pf-nav-pf-vertical">
-    <EmptyStateComponent title="Dolor" />
+    <EmptyStateComponent title="Status" />
   </Grid>
 );
 
-export default DolorPage;
+export default StatusPage;

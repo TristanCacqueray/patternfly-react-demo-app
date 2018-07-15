@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Breadcrumb, Grid } from 'patternfly-react';
 import PaginatedTableView from '../components/PaginatedTableView';
 
-const Ipsum1APage = () => (
+const BuildsPage = () => (
   <Grid fluid className="container-pf-nav-pf-vertical">
     <Grid.Row className="toolbar-pf">
       <Grid.Col xs={12}>
@@ -16,4 +16,4 @@ const Ipsum1APage = () => (
   </Grid>
 );
 
-export default Ipsum1APage;
+export default BuildsPage;

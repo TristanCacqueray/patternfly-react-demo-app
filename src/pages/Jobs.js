@@ -11,12 +11,12 @@ const rowActions = [
   { label: 'Action 2', fn: action2 }
 ];
 
-const AmetPage = () => (
+const JobsPage = () => (
   <Grid fluid className="container-pf-nav-pf-vertical">
     <Grid.Row>
       <Grid.Col xs={12}>
         <div className="page-header">
-          <h1>Amet Page</h1>
+          <h1>Jobs Page</h1>
         </div>
       </Grid.Col>
       <Grid.Col xs={12}>
@@ -55,4 +55,4 @@ const AmetPage = () => (
   </Grid>
 );
 
-export default AmetPage;
+export default JobsPage;
