@@ -26,6 +26,7 @@ import CustomToolbarFind from './CustomToolbarFind';
 import customSelectionHeaderCellFormatter from './customSelectionHeaderCellFormatter';
 import customSelectionCellFormatter from './customSelectionCellFormatter';
 
+import { ZuulApiRoot } from '../pages/constants';
 class PaginatedTableView extends React.Component {
   static deselectRow(row) {
     return Object.assign({}, row, { selected: false });
@@ -35,72 +36,6 @@ class PaginatedTableView extends React.Component {
   }
   constructor(props) {
     super(props);
-
-    const rows = [
-      {
-        id: 1,
-        name: 'cfmetest67',
-        path: 'vCenter/Datacenter2',
-        cluster: 'Raleigh',
-        allocatedSize: 3423231312,
-        valid: true,
-        message: 'Success'
-      },
-      {
-        id: 2,
-        name: 'cfmetest68',
-        path: 'vCenter/Datacenter2',
-        cluster: 'Raleigh',
-        allocatedSize: 84232313332,
-        valid: true,
-        message: 'Success'
-      },
-      {
-        id: 3,
-        name: 'cfmetest69',
-        path: 'vCenter/Datacenter2',
-        cluster: 'Raleigh',
-        allocatedSize: 2423221129,
-        valid: true,
-        message: 'Success'
-      },
-      {
-        id: 4,
-        name: 'cfmetest70',
-        path: 'vCenter/Datacenter1',
-        cluster: 'Boston',
-        allocatedSize: 2232322321,
-        warning: true,
-        message: 'High CPU'
-      },
-      {
-        id: 5,
-        name: 'cfmetest71',
-        path: 'vCenter/Datacenter1',
-        cluster: 'Boston',
-        allocatedSize: 2232322321,
-        warning: true,
-        message: 'High CPU'
-      },
-      {
-        id: 6,
-        name: 'cfmetest72',
-        path: 'vCenter/Datacenter1',
-        cluster: 'Boston',
-        allocatedSize: 2232322321,
-        invalid: true,
-        message: 'Disk Error'
-      },
-      {
-        id: 7,
-        name: 'cfmetest73',
-        path: 'vCenter/Datacenter1',
-        cluster: 'Boston',
-        allocatedSize: 2232322321,
-        invalid: true,
-        message: 'Disk Error'
-      }
-    ];
 
     const getSortingColumns = () => this.state.sortingColumns || {};
 
@@ -130,21 +65,21 @@ class PaginatedTableView extends React.Component {
 
     const filterTypes = [
       {
-        id: 'name',
-        title: 'VM Name',
-        placeholder: 'Filter by VM Name',
+        id: 'job_name',
+        title: 'Job',
+        placeholder: 'Filter by Job Name',
         filterType: 'text'
       },
       {
-        id: 'cluster',
-        title: 'Source Cluster',
-        placeholder: 'Filter by Source Cluster',
+        id: 'project',
+        title: 'Project',
+        placeholder: 'Filter by Project Name',
         filterType: 'text'
       },
       {
-        id: 'path',
-        title: 'Path',
-        placeholder: 'Filter by Path',
+        id: 'pipeline',
+        title: 'Pipeline',
+        placeholder: 'Filter by PipelineName',
         filterType: 'text'
       }
     ];
@@ -230,9 +165,9 @@ class PaginatedTableView extends React.Component {
           }
         },
         {
-          property: 'name',
+          property: 'job_name',
           header: {
-            label: 'VM Name',
+            label: 'Job',
             props: {
               index: 2,
               rowSpan: 1,
@@ -250,9 +185,9 @@ class PaginatedTableView extends React.Component {
           }
         },
         {
-          property: 'cluster',
+          property: 'project',
           header: {
-            label: 'Source Cluster',
+            label: 'Project',
             props: {
               index: 3,
               rowSpan: 1,
@@ -270,9 +205,9 @@ class PaginatedTableView extends React.Component {
           }
         },
         {
-          property: 'path',
+          property: 'pipeline',
           header: {
-            label: 'Path',
+            label: 'Pipeline',
             props: {
               index: 4,
               rowSpan: 1,
@@ -290,9 +225,9 @@ class PaginatedTableView extends React.Component {
           }
         },
         {
-          property: 'allocatedSize',
+          property: 'duration',
           header: {
-            label: 'Allocated Size',
+            label: 'Duration',
             props: {
               index: 5,
               rowSpan: 1,
@@ -308,7 +243,7 @@ class PaginatedTableView extends React.Component {
             },
             formatters: [
               (value, { rowData }) => (
-                <span>{numeral(rowData.allocatedSize).format('0.00b')}</span>
+                <span>{numeral(rowData.duration).format('0sec')}</span>
               ),
               Table.tableCellFormatter
             ]
@@ -317,7 +252,7 @@ class PaginatedTableView extends React.Component {
       ],
 
       // rows and row selection state
-      rows,
+      rows: [],
       selectedRows: [],
 
       // pagination default states
@@ -332,10 +267,10 @@ class PaginatedTableView extends React.Component {
     };
   }
   iconName = rowData => {
-    if (rowData.valid) {
+    if (rowData.result === 'SUCCESS') {
       return 'ok';
     }
-    if (rowData.warning) {
+    if (rowData.result === 'FAILURE') {
       return 'warning-triangle-o';
     }
     return 'error-circle-o';
@@ -371,8 +306,8 @@ class PaginatedTableView extends React.Component {
     }
   };
   onRow = (row, { rowIndex }) => {
-    const { selectedRows } = this.state;
-    const selected = selectedRows.indexOf(row.id) > -1;
+    const { rows } = this.state;
+    const selected = rows.indexOf(row.id) > -1;
     return {
       className: classNames({
         selected,
@@ -547,9 +482,37 @@ class PaginatedTableView extends React.Component {
     return rows;
   };
 
+  componentDidMount() {
+      fetch(ZuulApiRoot + "/builds")
+      .then(res => res.json())
+      .then(
+        (result) => {
+            for (var idx = 0; idx < result.length; idx++) {
+                result[idx].id = idx;
+            }
+          this.setState({
+            isLoaded: true,
+            rows: result
+          });
+        },
+        // Note: it's important to handle errors here
+        // instead of a catch() block so that we don't swallow
+        // exceptions from actual bugs in components.
+        (error) => {
+          this.setState({
+            isLoaded: true,
+            error
+          });
+        }
+      )
+  }
+
   render() {
     const {
+      error,
+      isLoaded,
       columns,
+      rows,
       pagination,
       sortingColumns,
       pageChangeValue,
@@ -560,6 +523,11 @@ class PaginatedTableView extends React.Component {
       selectedRows
     } = this.state;
 
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading...</div>;
+    }
     const filteredRows = this.filteredSearchedRows();
     const sortedPaginatedRows = this.currentRows(filteredRows);
 
@@ -581,16 +549,6 @@ class PaginatedTableView extends React.Component {
                 onKeyPress={e => this.onValueKeyPress(e)}
               />
             </Filter>
-
-            <div className="form-group">
-              <Button
-                onClick={() => {
-                  alert('Action clicked!');
-                }}
-              >
-                Action
-              </Button>
-            </div>
 
             <Toolbar.RightContent>
               <CustomToolbarFind
@@ -646,7 +604,7 @@ class PaginatedTableView extends React.Component {
                   cellProps,
                   columns,
                   sortingColumns,
-                  rows: sortedPaginatedRows.rows,
+                  rows: rows,
                   onSelectAllRows: this.onSelectAllRows
                 })
             }
@@ -654,7 +612,7 @@ class PaginatedTableView extends React.Component {
         >
           <Table.Header headerRows={resolve.headerRows({ columns })} />
           <Table.Body
-            rows={sortedPaginatedRows.rows || []}
+            rows={rows || []}
             rowKey="id"
             onRow={this.onRow}
           />

@@ -1,15 +1,14 @@
 import * as React from 'react';
-import { Breadcrumb, Grid } from 'patternfly-react';
+import { Grid } from 'patternfly-react';
 import PaginatedTableView from '../components/PaginatedTableView';
 
 const BuildsPage = () => (
   <Grid fluid className="container-pf-nav-pf-vertical">
-    <Grid.Row className="toolbar-pf">
+    <Grid.Row>
       <Grid.Col xs={12}>
-        <Breadcrumb>
-          <Breadcrumb.Item href="/">Ipsum</Breadcrumb.Item>
-          <Breadcrumb.Item active>Ipsum 1A</Breadcrumb.Item>
-        </Breadcrumb>
+        <div className="page-header">
+          <h1>Builds Page</h1>
+        </div>
       </Grid.Col>
     </Grid.Row>
     <PaginatedTableView />
